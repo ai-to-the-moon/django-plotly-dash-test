@@ -192,7 +192,7 @@ def site_root_url(context):
     return current_site_url.domain
 
 #same as the plotly_direct tag, except includes additional initial arguments
-@register.inclusion_tag("django_plotly_dash/plotly_direct.html", takes_context=True)
+@register.inclusion_tag("django_plotly_dash/plotly_direct_test.html", takes_context=True)
 def plotly_direct_test(context, name=None, slug=None, da=None, initial_arguments=None): #adding initial_arguments
     'Direct insertion of a Dash app'
 
