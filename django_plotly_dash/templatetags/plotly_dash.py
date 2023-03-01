@@ -190,3 +190,29 @@ def site_root_url(context):
     'Provide the root url of the demo site'
     current_site_url = get_current_site(context.request)
     return current_site_url.domain
+
+#same as the plotly_direct tag, except includes additional initial arguments
+@register.inclusion_tag("django_plotly_dash/plotly_direct.html", takes_context=True)
+def plotly_direct_test(context, name=None, slug=None, da=None, initial_arguments=None): #adding initial_arguments
+    'Direct insertion of a Dash app'
+
+    cache_id = store_initial_arguments(context['request'], initial_arguments) #adding this line from plotly_app
+
+    da, app = _locate_daapp(name, slug, da, cache_id=cache_id) #adding cache_id param from plotly_app
+
+    view_func = app.locate_endpoint_function()
+
+    # Load embedded holder inserted by middleware
+    eh = context.request.dpd_content_handler.embedded_holder
+
+    # Need to add in renderer launcher
+    renderer_launcher = '<script id="_dash-renderer" type="application/javascript">var renderer = new DashRenderer();</script>'
+
+    app.set_embedded(eh)
+    try:
+        resp = view_func()
+    finally:
+        eh.add_scripts(renderer_launcher)
+        app.exit_embedded()
+
+    return locals()
